@@ -140,6 +140,14 @@ editor—not this extraction pass—decides whether it makes the final email. DR
 items that are off-topic, routine administration, generic publicity with no useful
 supported claim, or genuinely empty or recycled content.
 
+Make that broad intelligence judgment in this single pass. Before returning DROP,
+reconsider whether the item contains a current, source-backed finance, banking,
+fintech, private-credit, AI, research, technical, venture-capital, accelerator, or
+capital-markets signal that could help the final editor keep Mike up to date. If it
+does, KEEP it and extract the useful quoted facts; do not reject it merely because it
+is not a completed transaction. The final editor, not this evidence pass, applies the
+10-story publication limit.
+
 Return the connected strict JSON object. Every kept fact needs an exact quotation
 copied from the source and its approved source URL. Never invent or infer a URL,
 entity, lender, borrower, counterparty, date, amount, currency, rate, or status.
@@ -304,39 +312,7 @@ class EvidenceAnalyst:
                     "Evidence failed closed after one repair: " + ", ".join(repair_error.codes)
                 ) from repair_error
 
-        if not _should_reconsider_for_intelligence(validated, source):
-            return validated
-
-        reconsidered = await self._client.complete_json(
-            schema_name="vdai_evidence_v1_intelligence_reconsideration",
-            schema=EVIDENCE_JSON_SCHEMA,
-            messages=[
-                *messages,
-                {
-                    "role": "assistant",
-                    "content": json.dumps(validated, ensure_ascii=False, separators=(",", ":")),
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        "Reconsider this once as an intelligence-brief item rather than only "
-                        "as a completed transaction. The source appears to contain a current "
-                        "finance, banking, fintech, private-credit, AI, research, or technical "
-                        "signal. KEEP it when at least one useful claim can be quoted exactly; "
-                        "the final editor will decide whether to publish it. Preserve DROP for "
-                        "routine, off-topic, empty, or generic publicity. Use only the supplied "
-                        "text and approved URLs. Return the full strict object only."
-                    ),
-                },
-            ],
-            forbidden_prompt_values=forbidden_prompt_values,
-        )
-        try:
-            return self._validate(reconsidered, source)
-        except EvidenceValidationError:
-            # The first result was already safe and valid. A malformed inclusive retry
-            # must not turn a routine rejection into a run-level failure.
-            return validated
+        return validated
 
     @staticmethod
     def _validate(output: Mapping[str, Any], source: Mapping[str, Any]) -> dict[str, Any]:
@@ -565,38 +541,6 @@ def _candidate_packet(candidate: Mapping[str, Any] | BaseModel) -> dict[str, Any
         "section_hint": str(section_hint)[:80],
         "watchlist_hits": [str(value)[:120] for value in (raw.get("watchlist_hits") or [])[:20]],
     }
-
-
-_INTELLIGENCE_SIGNAL = re.compile(
-    r"\b(?:asset[- ]backed|banking|benchmark|capital|compute|credit|covenant|debt|deposit|"
-    r"facility|financ(?:e|ing)|fund|gpu|inference|intercreditor|lender|loan|model|"
-    r"payment|payout|private credit|recovery|refinanc|research|secured|semiconductor|"
-    r"survey|technical|treasury|underwriting|venture)\b",
-    re.IGNORECASE,
-)
-
-
-def _should_reconsider_for_intelligence(
-    result: Mapping[str, Any], source: Mapping[str, Any]
-) -> bool:
-    """Give source-backed intelligence one inclusive pass before final editing."""
-
-    if str(result.get("decision", "")).upper() == "KEEP":
-        return False
-    if source.get("discovery_only") or source.get("source_class") not in {"A", "B", "C"}:
-        return False
-    section_hint = str(source.get("section_hint", "")).casefold()
-    if section_hint not in {
-        "deal_tape",
-        "competitive_field",
-        "ai_radar",
-        "runway_watch",
-    }:
-        return False
-    source_text = " ".join(
-        str(source.get(field, "")) for field in ("title", "summary_text", "body_text")
-    )
-    return bool(_INTELLIGENCE_SIGNAL.search(source_text))
 
 
 def _normalize_text(value: str) -> str:

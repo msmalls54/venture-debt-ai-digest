@@ -818,6 +818,37 @@ class GoogleSheetsRepository:
             raise SheetSecurityError("conflicting READY_TO_SEND editions share one send_id")
         return editions[-1] if editions else None
 
+    def load_latest_persisted_edition(self) -> Edition | None:
+        """Return the newest saved READY or SENT edition for model-free rerendering."""
+
+        _, rows = self._read(TAB_DIGEST_RUNS)
+        candidates: list[tuple[float, int, Mapping[str, Any]]] = []
+        for index, row in enumerate(rows):
+            if str(row.get("status") or "").strip().upper() not in {
+                "READY_TO_SEND",
+                "SENT",
+            }:
+                continue
+            raw_payload = str(row.get("edition_json") or "").strip()
+            if not raw_payload:
+                continue
+            observed = _parse_sheet_time(
+                row.get("completed_at") or row.get("started_at") or row.get("digest_date")
+            )
+            candidates.append((observed.timestamp() if observed else 0.0, index, row))
+        if not candidates:
+            return None
+
+        row = max(candidates, key=lambda candidate: (candidate[0], candidate[1]))[2]
+        try:
+            payload = _decode_persisted_edition(json.loads(str(row["edition_json"])))
+            edition = Edition.model_validate(payload)
+        except (json.JSONDecodeError, ValidationError, TypeError, ValueError) as error:
+            raise SheetSchemaError("latest digest has an invalid persisted edition") from error
+        if not edition.stories:
+            raise SheetSchemaError("latest digest has no persisted stories to rerender")
+        return edition
+
     def load_candidate_index(
         self,
         *,

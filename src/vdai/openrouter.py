@@ -70,6 +70,8 @@ class OpenRouterClient:
         self._endpoint = endpoint
         self._owns_client = client is None
         self._json_object_schemas: set[str] = set()
+        self._logical_call_count = 0
+        self._request_count = 0
         self._client = client or httpx.AsyncClient(
             timeout=httpx.Timeout(timeout_seconds),
             follow_redirects=False,
@@ -89,6 +91,18 @@ class OpenRouterClient:
     async def aclose(self) -> None:
         if self._owns_client:
             await self._client.aclose()
+
+    @property
+    def logical_call_count(self) -> int:
+        """Return the number of model tasks attempted by this worker process."""
+
+        return self._logical_call_count
+
+    @property
+    def request_count(self) -> int:
+        """Return physical OpenRouter requests, including bounded repair fallbacks."""
+
+        return self._request_count
 
     async def complete_json(
         self,
@@ -115,6 +129,7 @@ class OpenRouterClient:
 
         normalized_messages = self._validate_messages(messages)
         self._assert_prompt_privacy(normalized_messages, forbidden_prompt_values)
+        self._logical_call_count += 1
 
         provider_schema = _provider_schema(schema)
         schema_fingerprint = sha256(
@@ -176,6 +191,7 @@ class OpenRouterClient:
 
         request_timeout = httpx.Timeout(90.0) if web_search else self._client.timeout
         try:
+            self._request_count += 1
             response = await self._client.post(
                 self._endpoint,
                 headers=headers,
@@ -192,6 +208,7 @@ class OpenRouterClient:
             payload["messages"] = _schema_prompt(normalized_messages, provider_schema)
             payload["response_format"] = {"type": "json_object"}
             try:
+                self._request_count += 1
                 response = await self._client.post(
                     self._endpoint,
                     headers=headers,
@@ -229,6 +246,7 @@ class OpenRouterClient:
             ]
             payload["response_format"] = {"type": "json_object"}
             try:
+                self._request_count += 1
                 response = await self._client.post(
                     self._endpoint,
                     headers=headers,

@@ -165,7 +165,7 @@ async def test_first_party_source_cannot_be_held_for_a_primary_source() -> None:
 
 
 @pytest.mark.asyncio
-async def test_source_backed_intelligence_drop_gets_one_editor_inclusive_pass() -> None:
+async def test_source_backed_intelligence_drop_uses_one_broad_judgment_pass() -> None:
     candidate = {
         **_candidate(),
         "source_class": "A",
@@ -187,13 +187,15 @@ async def test_source_backed_intelligence_drop_gets_one_editor_inclusive_pass() 
             "rationale": "Not a completed transaction.",
         }
     )
-    client = _ScriptedClient([dropped, _valid_output()])
+    client = _ScriptedClient([dropped])
 
     result = await EvidenceAnalyst(client).analyze(candidate)  # type: ignore[arg-type]
 
-    assert result["decision"] == "KEEP"
-    assert len(client.calls) == 2
-    assert "intelligence-brief item" in client.calls[1]["messages"][-1]["content"]
+    assert result["decision"] == "DROP"
+    assert len(client.calls) == 1
+    system_prompt = client.calls[0]["messages"][0]["content"]
+    assert "Make that broad intelligence judgment in this single pass" in system_prompt
+    assert "final editor, not this evidence pass" in system_prompt
 
 
 @pytest.mark.asyncio

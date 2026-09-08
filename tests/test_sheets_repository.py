@@ -418,6 +418,53 @@ def test_large_ready_edition_is_compressed_and_round_trips() -> None:
     assert restored.model_dump(mode="json") == large_edition.model_dump(mode="json")
 
 
+def test_latest_persisted_edition_prefers_newest_sent_or_ready_run() -> None:
+    _, older_edition = story_and_edition()
+    newer_edition = older_edition.model_copy(
+        update={
+            "run_id": "run-newer",
+            "subject": "Newer saved brief",
+            "generated_at": NOW + timedelta(hours=2),
+        }
+    )
+    older = DigestRun(
+        run_id="run-older",
+        digest_date=older_edition.edition_date,
+        started_at=NOW,
+        completed_at=NOW,
+        agent_model="google/gemini-3.8-flash",
+        send_id="vdai-older",
+        recipient_group="owner_test",
+        status=DigestRunStatus.SENT,
+        edition_json=older_edition.model_dump(mode="json"),
+    )
+    newer = DigestRun(
+        run_id="run-newer",
+        digest_date=newer_edition.edition_date,
+        started_at=NOW + timedelta(hours=2),
+        agent_model="google/gemini-3.8-flash",
+        send_id="vdai-newer",
+        recipient_group="owner_test",
+        status=DigestRunStatus.READY_TO_SEND,
+        edition_json=newer_edition.model_dump(mode="json"),
+    )
+    repo, _ = repository(
+        **{
+            "Digest Runs": [
+                ["run_id", "status", "started_at", "completed_at", "edition_json"]
+            ],
+        }
+    )
+    repo.upsert_digest_run(older)
+    repo.upsert_digest_run(newer)
+
+    restored = repo.load_latest_persisted_edition()
+
+    assert restored is not None
+    assert restored.run_id == "run-newer"
+    assert restored.subject == "Newer saved brief"
+
+
 def test_public_editor_queries_reconstruct_facts_history_send_and_latest_health() -> None:
     old = (NOW - timedelta(days=10)).isoformat()
     recent = (NOW - timedelta(hours=2)).isoformat()

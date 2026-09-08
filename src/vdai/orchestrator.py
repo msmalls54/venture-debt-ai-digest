@@ -42,7 +42,7 @@ from .research import WebResearchScout
 from .sheets import GoogleSheetsRepository
 
 MAX_EVIDENCE_CALLS = 60
-EVIDENCE_POLICY_VERSION = "intelligence-v2"
+EVIDENCE_POLICY_VERSION = "intelligence-v3-one-pass"
 WEB_RESEARCH_EVIDENCE_RESERVE = 8
 DEBT_SECONDARY_EVIDENCE_RESERVE = 4
 EVIDENCE_CONCURRENCY = 4
@@ -427,6 +427,9 @@ class RunSummary:
     successful_job_count: int = 0
     failed_job_count: int = 0
     candidate_count: int = 0
+    unseen_candidate_count: int = 0
+    relevance_filter_drop_count: int = 0
+    freshness_filter_drop_count: int = 0
     candidate_pool_before_cap: int = 0
     candidate_source_count_before_cap: int = 0
     selected_source_count: int = 0
@@ -661,15 +664,19 @@ class DigestOrchestrator:
             _attach_watchlist_hits(candidate, company_watchlist, deposit_watchlist)
             for candidate in new_candidates
         ]
+        summary.unseen_candidate_count = len(new_candidates)
+        before_relevance = len(new_candidates)
         new_candidates = [
             candidate for candidate in new_candidates if _candidate_is_relevant(candidate)
         ]
+        summary.relevance_filter_drop_count = before_relevance - len(new_candidates)
         freshness_cutoff = _analysis_window_start(
             now,
             last_sent_at,
             editor_requested=editor_requested,
             full_brief=full_brief,
         )
+        before_freshness = len(new_candidates)
         new_candidates = [
             candidate
             for candidate in new_candidates
@@ -680,6 +687,7 @@ class DigestOrchestrator:
                 source_job_item_count=job_item_counts.get(candidate.source_job_key, 1),
             )
         ]
+        summary.freshness_filter_drop_count = before_freshness - len(new_candidates)
         summary.candidate_pool_before_cap = len(new_candidates)
         summary.candidate_source_count_before_cap = len(
             {candidate.source_id for candidate in new_candidates}

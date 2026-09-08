@@ -78,6 +78,16 @@ def build_parser() -> argparse.ArgumentParser:
         "render-canary", help="Render a network-free black-and-silver sample"
     )
     canary.add_argument("--output-dir", type=Path, default=Path("artifacts/canary"))
+
+    rerender = subparsers.add_parser(
+        "rerender-latest",
+        help="Rerender the latest saved brief without sources, models, writes, or email",
+    )
+    rerender.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("artifacts/rerender-latest"),
+    )
     return parser
 
 
@@ -222,7 +232,14 @@ async def _run_command(args: argparse.Namespace) -> tuple[dict[str, Any], Render
             send_revision=getattr(args, "revision", None),
             manual_source_id=args.source_id,
         )
-        return summary.as_dict(), orchestrator.last_rendered
+        result = summary.as_dict()
+        result.update(
+            {
+                "openrouter_logical_call_count": openrouter.logical_call_count,
+                "openrouter_request_count": openrouter.request_count,
+            }
+        )
+        return result, orchestrator.last_rendered
 
 
 async def _fetch_canary_command(args: argparse.Namespace) -> dict[str, Any]:
@@ -453,6 +470,22 @@ def _canary() -> dict[str, Any]:
     }
 
 
+def _rerender_latest_command(output_dir: Path) -> dict[str, Any]:
+    settings = _settings()
+    repository = GoogleSheetsRepository.from_settings(settings)
+    edition = repository.load_latest_persisted_edition()
+    if edition is None:
+        raise ConfigurationError("no persisted READY_TO_SEND or SENT edition is available")
+    rendered = render_digest(edition)
+    return {
+        "status": "LATEST_EDITION_RERENDERED",
+        "run_id": edition.run_id,
+        "story_count": len(edition.stories),
+        "openrouter_request_count": 0,
+        **_write_preview(rendered, output_dir),
+    }
+
+
 def _exit_code(result: dict[str, Any]) -> int:
     if result.get("status") == "FETCH_CANARY_FAILED":
         return 2
@@ -472,6 +505,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "render-canary":
             rendered = render_digest(_canary(), test_mode=True)
             result = {"status": "CANARY_RENDERED", **_write_preview(rendered, args.output_dir)}
+        elif args.command == "rerender-latest":
+            result = _rerender_latest_command(args.output_dir)
         else:
             result, rendered = asyncio.run(_run_command(args))
             if rendered is not None and args.preview_dir is not None:

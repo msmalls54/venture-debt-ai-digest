@@ -40,6 +40,8 @@ async def test_openrouter_request_pins_reasoning_schema_and_provider_parameters(
         )
 
     assert result == {"ok": True}
+    assert client.logical_call_count == 1
+    assert client.request_count == 1
     body = captured["body"]
     assert isinstance(body, dict)
     assert body["model"] == OPENROUTER_MODEL == "google/gemini-3.8-flash"
@@ -217,6 +219,8 @@ async def test_openrouter_caches_json_object_fallback_after_provider_schema_reje
         )
 
     assert first == second == {"ok": True}
+    assert client.logical_call_count == 2
+    assert client.request_count == 3
     assert [request["response_format"]["type"] for request in requests] == [
         "json_schema",
         "json_object",

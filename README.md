@@ -29,6 +29,9 @@ configured. The evidence pass preserves source-backed market intelligence for th
 instead of requiring every item to be a completed transaction. Validated model drops are
 versioned and recorded so unchanged pages do not repeatedly consume the review budget, while
 older-policy drops and transient model failures remain eligible for a bounded retry.
+Every selected candidate receives one broad Gemini judgment pass. Code repairs an invalid or
+ungrounded response once when necessary, but a valid `DROP` no longer triggers a second paid
+relevance call. Run receipts report both logical model calls and physical OpenRouter requests.
 
 ## Schedule and weekend behavior
 
@@ -79,6 +82,7 @@ vdai-digest fetch-canary --source-id S003
 vdai-digest collect --dry-run
 vdai-digest run --dry-run --force-editor --preview-dir artifacts/preview
 vdai-digest render-canary
+vdai-digest rerender-latest --output-dir artifacts/rerender-latest
 vdai-digest run
 vdai-digest send-once
 ```
@@ -95,6 +99,11 @@ email-safe HTML, plain text, and a responsive `digest-dashboard.html` browser in
 `--preview-dir`. The browser interface uses the same validated edition and citations but is
 designed for a full desktop or mobile screen instead of email-client width. Dry-run mode does
 not write health, event, edition, story, or send records to the Sheet and cannot send email.
+
+`rerender-latest` reads the newest persisted `READY_TO_SEND` or `SENT` edition and regenerates
+the email HTML, plain text, and browser view without collecting sources, calling OpenRouter,
+writing to the Sheet, or sending email. Use this path for all layout, color, logo, and inbox
+compatibility work so visual iteration does not rerun Gemini.
 
 `send-once` is the idempotent first-delivery path. It bypasses only the weekday and time-window
 restriction. It still requires valid credentials, an enabled worker, healthy sources, a valid
