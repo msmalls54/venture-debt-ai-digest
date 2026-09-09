@@ -70,10 +70,10 @@ class _EditorialOutput(BaseModel):
 
     edition: _Edition
     lead: _Story | None
-    deal_tape: list[_Story] = Field(max_length=5)
-    competitive_field: list[_Story] = Field(max_length=5)
-    ai_radar: list[_Story] = Field(max_length=3)
-    runway_watch: list[_Story] = Field(max_length=5)
+    deal_tape: list[_Story] = Field(max_length=15)
+    competitive_field: list[_Story] = Field(max_length=15)
+    ai_radar: list[_Story] = Field(max_length=15)
+    runway_watch: list[_Story] = Field(max_length=15)
     quiet_day: bool
 
 
@@ -81,13 +81,13 @@ EDITORIAL_JSON_SCHEMA: dict[str, Any] = _EditorialOutput.model_json_schema()
 
 SECTION_CAPS = {
     "lead": 1,
-    "deal_tape": 5,
-    "competitive_field": 5,
-    "ai_radar": 3,
-    "runway_watch": 5,
+    "deal_tape": 15,
+    "competitive_field": 15,
+    "ai_radar": 15,
+    "runway_watch": 15,
 }
-MAX_STORIES = 10
-MAX_WORDS = 5_000
+MAX_STORIES = 15
+MAX_WORDS = 7_500
 MIN_STORIES_FOR_FULL_POOL = 8
 SECONDARY_EVIDENCE_MIN_CONFIDENCE = 80
 
@@ -112,9 +112,12 @@ evidence supports that depth. Write like one informed analyst, not a repeated te
 label or mechanically begin paragraphs with phrases such as "first-order consequence,"
 "second-order implications," or "uncertainty centers." Do not shorten useful analysis, but do
 not pad or add unsupported background. A story may appear once. Respect
-section caps and ten stories total. Treat the supplied evidence pool as an intelligence
-brief, not only a transaction ledger. When the supplied pool contains at least ten useful,
-source-backed events, normally select ten. Select at least eight whenever eight such events
+section caps and fifteen stories total. Mike wants a substantial read: aim for twelve to
+fifteen distinct, useful stories when the supplied evidence supports them. Treat the supplied
+pool as an intelligence brief, not only a transaction ledger. Do not stop at eight or ten
+when more useful developments are available. There is no separate three-story AI limit;
+allocate space by significance while giving venture lending the front page and deepest
+treatment. Select at least eight whenever eight such events
 are available. Publish fewer only when the supplied pool genuinely cannot support eight;
 never invent filler. Lead with consequence;
 write sharp, skeptical copy.
@@ -218,7 +221,7 @@ class DailyEditor:
         forbidden_prompt_values: Sequence[str] = (),
     ) -> dict[str, Any]:
         packet = [_event_packet(event) for event in events]
-        packet = [event for event in packet if event is not None][:30]
+        packet = [event for event in packet if event is not None][:60]
         messages = [
             {"role": "system", "content": _SYSTEM_PROMPT},
             {

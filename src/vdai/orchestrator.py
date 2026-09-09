@@ -1101,7 +1101,7 @@ class DigestOrchestrator:
         history = self.repository.load_published_history(
             since=now - timedelta(days=int(sheet_settings.get("dedupe_window_days", 7)))
         )
-        ranked = rank_eligible_events([*eligible, *current_event_rows], history, now=now, limit=30)
+        ranked = rank_eligible_events([*eligible, *current_event_rows], history, now=now, limit=60)
         if ranked:
             draft = await self.editor.draft(
                 ranked,

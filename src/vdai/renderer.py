@@ -112,6 +112,8 @@ def render_digest(
         "<style>:root{color-scheme:dark only;supported-color-schemes:dark}"
         "body,.vd-root{background-color:#050706;background-image:linear-gradient(#050706,#050706)}"
         ".vd-shell{background-color:#090d0b;background-image:linear-gradient(#090d0b,#090d0b)}"
+        "u + .vd-root .gmail-blend-screen{background:#000;mix-blend-mode:screen}"
+        "u + .vd-root .gmail-blend-difference{background:#000;mix-blend-mode:difference}"
         "@media only screen and (max-width:720px){"
         ".vd-shell{width:100%!important;max-width:100%!important}"
         ".vd-tape-row,.vd-story-head,.vd-story-fields{width:100%!important;max-width:100%!important;table-layout:auto!important}"
@@ -119,7 +121,7 @@ def render_digest(
         ".vd-logo-cell{width:auto!important;max-width:none!important;padding-right:8px!important}"
         ".vd-shell td,.vd-shell div,.vd-shell a{overflow-wrap:anywhere!important;word-break:break-word!important}"
         ".vd-pad{padding-left:14px!important;padding-right:14px!important}"
-        ".vd-hide-mobile{display:none!important}.vd-title{font-size:23px!important;line-height:27px!important}"
+        ".vd-hide-mobile{display:none!important}.vd-title{font-size:26px!important;line-height:33px!important}"
         ".vd-date{float:none!important;display:block!important;margin-top:2px!important}"
         ".vd-label{width:100%!important;display:block!important;padding-bottom:4px!important}"
         ".vd-copy{box-sizing:border-box!important;width:100%!important;display:block!important;border-left:0!important;padding-left:0!important}"
@@ -150,10 +152,10 @@ def render_digest(
         + '<tr><td class="vd-pad" bgcolor="#090d0b" style="padding:18px 20px 16px;'
         'background:#090d0b;background-image:linear-gradient(#090d0b,#090d0b);'
         'border-bottom:1px solid #283329;">'
-        '<div class="vd-title" style="font-family:Consolas,\'Courier New\',monospace;'
-        'font-size:28px;line-height:32px;font-weight:900;color:#ffffff!important;'
+        '<div class="vd-title" style="font-family:Arial,Helvetica,sans-serif;'
+        'font-size:32px;line-height:40px;font-weight:700;color:#ffffff!important;'
         '-webkit-text-fill-color:#ffffff!important;">'
-        + escape(headline)
+        + _white_headline(headline)
         + "</div></td></tr>"
         + '<tr><td bgcolor="#090d0b" style="padding:0;background:#090d0b;'
         'background-image:linear-gradient(#090d0b,#090d0b);border-bottom:1px solid #283329;">'
@@ -189,6 +191,21 @@ def render_digest(
     )
 
 
+def _white_headline(value: str) -> str:
+    """Keep white headline glyphs visible when Gmail iOS inverts text colors.
+
+    Gmail-only blend layers counter its color inversion; other clients see ordinary
+    escaped text. Do not wrap logos or orange labels in these white-text layers.
+    https://www.hteumeuleu.com/2021/fixing-gmail-dark-mode-css-blend-modes/
+    """
+
+    return (
+        '<div class="gmail-blend-screen"><div class="gmail-blend-difference">'
+        + escape(value)
+        + "</div></div>"
+    )
+
+
 def _render_tape(stories: list[dict[str, Any]], registry: Mapping[str, str]) -> str:
     if not stories:
         return (
@@ -217,10 +234,11 @@ def _render_tape(stories: list[dict[str, Any]], registry: Mapping[str, str]) -> 
             + '</td><td class="vd-hide-mobile" width="54" valign="middle" bgcolor="#090d0b" style="font-family:Consolas,'
             "'Courier New',monospace;font-size:9px;font-weight:800;color:#4ee7ff!important;-webkit-text-fill-color:#4ee7ff!important;\">"
             + escape(_SECTION_CODES[section])
-            + '</td><td valign="middle" bgcolor="#090d0b" style="font-family:Consolas,\'Courier New\',monospace;'
-            'font-size:11px;line-height:16px;font-weight:700;color:#f3f6f3!important;'
-            '-webkit-text-fill-color:#f3f6f3!important;">'
-            + escape(_text(story.get("headline")))
+            + '</td><td valign="middle" bgcolor="#090d0b" style="font-family:Arial,Helvetica,sans-serif;'
+            'background:#090d0b;background-image:linear-gradient(#090d0b,#090d0b);'
+            'font-size:16px;line-height:23px;font-weight:700;color:#ffffff!important;'
+            '-webkit-text-fill-color:#ffffff!important;">'
+            + _white_headline(_text(story.get("headline")))
             + "</td></tr></table></td></tr>"
         )
     return "".join(rows)
@@ -281,10 +299,11 @@ def _render_story(
         + " / "
         + escape(_story_company(story).upper())
         + "</td></tr></table>"
-        '<div style="padding:11px 0 14px;font-family:Consolas,\'Courier New\',monospace;'
-        'font-size:21px;line-height:26px;font-weight:900;color:#ffffff!important;'
+        '<div style="padding:11px 0 14px;font-family:Arial,Helvetica,sans-serif;'
+        'background:#090d0b;background-image:linear-gradient(#090d0b,#090d0b);'
+        'font-size:25px;line-height:32px;font-weight:700;color:#ffffff!important;'
         '-webkit-text-fill-color:#ffffff!important;">'
-        + escape(_text(story.get("headline")))
+        + _white_headline(_text(story.get("headline")))
         + '</div><table class="vd-story-fields" role="presentation" width="100%" cellpadding="0" cellspacing="0" '
         'border="0" bgcolor="#090d0b" style="width:100%;background:#090d0b;'
         'background-image:linear-gradient(#090d0b,#090d0b);'

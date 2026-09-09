@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any
@@ -8,6 +9,8 @@ import pytest
 
 from vdai.editor import DailyEditor, EditorialRejected, _event_packet, edition_from_draft
 from vdai.models import (
+    DigestRun,
+    DigestRunStatus,
     DigestSection,
     EventStatus,
     EventV1,
@@ -106,6 +109,35 @@ def test_editor_admits_strong_exact_quote_secondary_evidence() -> None:
     assert packet is not None
     assert packet["evidence_tier"] == "C"
     assert packet["confidence"] == 82
+
+
+@pytest.mark.asyncio
+async def test_fifteen_stories_beyond_old_editor_pool_round_trip_to_saved_run() -> None:
+    events = [
+        _event().model_copy(update={"event_id": f"S054:item-{i}", "candidate_id": f"S054:item-{i}"})
+        for i in range(1, 61)
+    ]
+    draft = _valid_draft()
+    template = draft["ai_radar"][0]
+    draft["ai_radar"] = [dict(template, event_id=f"S054:item-{i}") for i in range(31, 46)]
+    client = _ScriptedClient([draft])
+    result = await DailyEditor(client).draft(events, edition_date="2026-08-25")
+    assert result["story_count"] == 15
+    assert len(client.calls) == 1
+    assert len(json.loads(client.calls[0]["messages"][1]["content"])["events"]) == 60
+    edition = edition_from_draft(result, events, run_id="RUN-expanded")
+    run = DigestRun(
+        run_id=edition.run_id,
+        digest_date=edition.edition_date,
+        started_at=edition.generated_at,
+        selected_count=15,
+        agent_model="google/gemini-3.8-flash",
+        send_id="expanded-test",
+        recipient_group="test",
+        status=DigestRunStatus.READY_TO_SEND,
+        edition_json=edition.model_dump(mode="json"),
+    )
+    assert len(run.edition_json["stories"]) == 15
 
 
 @pytest.mark.asyncio

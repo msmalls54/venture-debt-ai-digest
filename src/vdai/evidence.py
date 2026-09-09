@@ -146,7 +146,7 @@ fintech, private-credit, AI, research, technical, venture-capital, accelerator, 
 capital-markets signal that could help the final editor keep Mike up to date. If it
 does, KEEP it and extract the useful quoted facts; do not reject it merely because it
 is not a completed transaction. The final editor, not this evidence pass, applies the
-10-story publication limit.
+15-story publication limit.
 
 Return the connected strict JSON object. Every kept fact needs an exact quotation
 copied from the source and its approved source URL. Never invent or infer a URL,

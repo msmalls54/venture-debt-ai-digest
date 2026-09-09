@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime
 
+from bs4 import BeautifulSoup
+
 from vdai.models import Citation, DigestSection, Edition, Story
 from vdai.renderer import render_digest
 
@@ -121,6 +123,20 @@ def test_renderer_accepts_strict_edition_and_builds_terminal_email() -> None:
     ):
         assert noise not in rendered.html.casefold()
         assert noise not in rendered.browser_html.casefold()
+
+
+def test_headlines_have_gmail_inversion_layers_without_touching_logos() -> None:
+    rendered = render_digest(_edition())
+    soup = BeautifulSoup(rendered.html, "html.parser")
+    protected = soup.select(".gmail-blend-screen > .gmail-blend-difference")
+    assert [node.get_text() for node in protected] == [
+        _edition().subject, _edition().stories[0].headline, _edition().stories[0].headline
+    ]
+    assert all(node.find("img") is None for node in protected)
+    selector = "u + .vd-root .gmail-blend-screen{background:#000;mix-blend-mode:screen}"
+    assert selector in rendered.html
+    assert "mix-blend-mode:difference" in rendered.html
+    assert "font-size:16px;line-height:23px" in rendered.html
 
 
 def test_renderer_uses_editorial_section_labels_and_lists_every_story_at_a_glance() -> None:

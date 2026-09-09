@@ -396,8 +396,8 @@ class Edition(StrictModel):
     run_id: NonEmptyStr
     edition_date: date
     subject: NonEmptyStr = Field(max_length=180)
-    stories: tuple[Story, ...] = Field(max_length=10)
-    word_count: int = Field(ge=0, le=5_000)
+    stories: tuple[Story, ...] = Field(max_length=15)
+    word_count: int = Field(ge=0, le=7_500)
     html: str = ""
     text: str = ""
     generated_at: AwareDatetime
@@ -420,7 +420,7 @@ class DigestRun(StrictModel):
     completed_at: AwareDatetime | None = None
     health_status: Literal["HEALTHY", "DEGRADED", "UNKNOWN"] = "UNKNOWN"
     candidate_count: int = Field(default=0, ge=0)
-    selected_count: int = Field(default=0, ge=0, le=10)
+    selected_count: int = Field(default=0, ge=0, le=15)
     section_counts: dict[str, int] = Field(default_factory=dict)
     agent_model: NonEmptyStr
     subject: str = ""

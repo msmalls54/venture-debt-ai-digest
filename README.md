@@ -134,7 +134,10 @@ presents the complete commentary in a responsive Bloomberg-terminal-inspired lay
 panels, orange interface labels, white headlines, and explicit email-safe contrast controls.
 
 The editor may leave any editorial section empty; healthy coverage in every possible section is
-not required. A normal edition is capped at 10 stories. The 5,000-word edition limit is a
+not required. The editor sees up to 60 eligible events and aims for 12–15 useful stories
+when the evidence supports them. A normal edition is capped at 15 stories; individual
+sections can use the available space without a separate three-story AI ceiling.
+The 7,500-word edition limit is a
 technical safety ceiling, not a target, and applies to the complete validated edition.
 
 When source coverage is healthy but no verified development clears the materiality bar, a
@@ -154,7 +157,7 @@ verified story is present.
 | `collector.py` | Runs the current source jobs with bounded concurrency and per-job failure isolation. | One broken source cannot cancel the rest of the core. |
 | `evidence.py` | Asks Gemini 3.8 Flash through OpenRouter at low reasoning to extract facts, then checks every fact in code. | The model may judge; it may not invent evidence. |
 | `ranking.py` | Removes previously published events and orders the remaining evidence. | The editor sees the strongest fresh material first. |
-| `editor.py` | Drafts the briefing at high reasoning under strict story, fact, number, entity, citation, and 5,000-word edition limits. | High-cost reasoning is reserved for the final editorial pass; unsupported claims are not. |
+| `editor.py` | Drafts the briefing at high reasoning under strict story, fact, number, entity, citation, and 7,500-word edition limits. | High-cost reasoning is reserved for the final editorial pass; unsupported claims are not. |
 | `renderer.py` | Produces responsive terminal-style HTML and a plain-text email fallback. | The model never controls layout or executable HTML. |
 | `agentmail.py` | Sends one private-BCC message with a stable idempotency key. | Retries cannot create duplicate emails. |
 | `sheets.py` | Reads controls and writes events, Railway health receipts, persisted editions, stories, and send receipts in batches. Legacy n8n health rows are preserved and excluded from Railway validation. | The Sheet remains the durable operating record. |
