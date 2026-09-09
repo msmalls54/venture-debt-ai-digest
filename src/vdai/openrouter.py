@@ -189,7 +189,13 @@ class OpenRouterClient:
             "Content-Type": "application/json",
         }
 
-        request_timeout = httpx.Timeout(90.0) if web_search else self._client.timeout
+        # A full 15-story high-reasoning draft needs more time than routine evidence
+        # extraction. This changes the timeout, not token limits or retry count.
+        request_timeout = (
+            httpx.Timeout(90.0)
+            if web_search
+            else httpx.Timeout(120.0) if reasoning_effort == "high" else self._client.timeout
+        )
         try:
             self._request_count += 1
             response = await self._client.post(

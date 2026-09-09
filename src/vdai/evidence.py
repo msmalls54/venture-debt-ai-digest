@@ -167,6 +167,16 @@ Never return NEEDS_PRIMARY_SOURCE for a directly fetched first-party source: it 
 already the primary source. For a first-party item, choose KEEP when it contains useful
 supported intelligence and DROP only when it is routine or off-topic.
 
+Preserve the details that let the final editor explain this specific announcement.
+When the supplied body contains them, extract separate exact-quote facts for the
+parties and their roles, structure and terms, what the money funds or replaces,
+previous versus new capability, distribution or deployment details, reported results
+and their attribution, and explicit limitations. Do not stop after extracting the
+headline amount or launch sentence when the body supports additional useful facts.
+Include the relevant surrounding clause in each quote so conditions are not lost.
+If the record only supplies a headline, keep its supported fact when relevant but
+state that evidence limitation in rationale; never fill missing detail from memory.
+
 KEEP a first-party, material finance-platform development in competitive_field even
 when it is not a completed financing and has no borrower, lender, or facility. This
 includes a major private-credit or capital-markets platform expansion, fund or

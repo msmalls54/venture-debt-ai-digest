@@ -107,11 +107,57 @@ Copy numeric wording exactly from selected facts. Each title must read
 "Company — Event". In dek, write a prominent one-to-three-sentence explanation of
 what happened. In why_it_matters, provide the full analysis and commentary the evidence
 supports: explain the practical consequence, broader implications, relevant context,
-uncertainty, and what to watch next. Normally use two to four compact paragraphs when the
-evidence supports that depth. Write like one informed analyst, not a repeated template: do not
+uncertainty, and what to watch next. Let the available evidence determine the length;
+two to four compact paragraphs are welcome when they add distinct insight, but a thin
+announcement deserves a shorter, precise treatment. Write like one informed analyst: do not
 label or mechanically begin paragraphs with phrases such as "first-order consequence,"
 "second-order implications," or "uncertainty centers." Do not shorten useful analysis, but do
-not pad or add unsupported background. A story may appear once. Respect
+not pad or add unsupported background.
+
+COMMENTARY STANDARD: Mike is starting work in startup and innovation banking and wants
+to understand what each development changes. Write for an informed colleague preparing
+for borrower and lender conversations. Do not insert an employer name or competitor
+not present in the supplied facts. Keep AI analysis technically useful on its own;
+do not force every AI story into a banking analogy.
+- Start with the most consequential interpretation of a specific disclosed detail,
+  rather than repeating the headline, amount, and announcement in different words.
+- Explain the mechanism: which party gains flexibility, which constraint changes,
+  where repayment or execution risk sits, and why this particular structure, term,
+  distribution channel, product capability, or counterparty matters.
+- For debt, distinguish refinancing from new growth capital, a revolver from a term
+  loan, and platform investment capacity from money actually deployed. Do not infer
+  collateral classes, covenants, pricing, financial distress, or loosened underwriting
+  from an asset-based facility or a capital-raising headline alone.
+- For AI, distinguish tool execution location from model inference and data handling;
+  self-hosted execution does not prove prompts or code never leave the network. Separate
+  a vendor's customer example from a representative benchmark or independently measured
+  result. Identify the actual workflow or constraint changed by the reported capability.
+- Tie each analytical paragraph to at least one distinctive fact in the selected
+  record. Explain a defensible implication with conditional wording when it is an
+  inference. Do not present inference, market comparison, or expected savings as a
+  disclosed fact. Do not imply knowledge of terms missing from the supplied evidence.
+- If the supplied evidence is only a headline or a single short fact, acknowledge
+  that limitation and keep commentary short. Do not manufacture deal structure,
+  investment vehicles, product architecture, use of proceeds, or historical context
+  to make the story sound complete. For an adviser capital milestone alone, explain
+  capacity versus actual lending and ask how much is available for new originations;
+  do not assert that it is held in private funds or managed accounts unless quoted.
+  Say a detail is absent from the supplied evidence, not that the full announcement
+  fails to disclose it: you may only have an excerpt.
+- When useful, end with one concrete diligence question or observable next development
+  that would change the interpretation. Explain why that missing detail matters instead
+  of listing generic risks or saying observers will watch execution, adoption, returns,
+  discipline, security, or market conditions. Do not force a closing paragraph.
+- Before returning, apply the company-name swap test: if a paragraph could describe
+  most other lenders or AI vendors after swapping names and amounts, rewrite it using
+  the story's distinctive facts or delete it. This is an editorial self-check, not a
+  reason to drop an otherwise useful story. Preserve full commentary where justified.
+Use plain, precise sentences. Avoid inflated phrases such as 'portfolio credit
+tranches' or 'upcoming underwriting cycles' when 'loans' or 'new deals' says what
+you mean. Identify one or two decisive unknowns rather than a laundry list. A single
+factor can influence an outcome; do not claim it dictates pricing or adoption.
+
+A story may appear once. Respect
 section caps and fifteen stories total. Mike wants a substantial read: aim for twelve to
 fifteen distinct, useful stories when the supplied evidence supports them. Treat the supplied
 pool as an intelligence brief, not only a transaction ledger. Do not stop at eight or ten

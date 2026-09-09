@@ -129,6 +129,13 @@ Each published story is rendered in this order:
    and what to watch next. Multiple paragraphs are allowed when they add value.
 4. Approved HTTPS citations added by deterministic code.
 
+Commentary starts with an implication tied to a distinctive disclosed fact, explains
+the mechanism, and separates reported terms from conditional inference. A concrete
+diligence question belongs only where it adds value. The editor removes paragraphs
+that could fit most other companies after swapping names; thin evidence does not
+require three paragraphs. Lending analysis supports startup-banking conversations,
+while AI coverage retains technical detail without a forced banking analogy.
+
 The email opens with an `At a glance` list of every selected headline and a story count, then
 presents the complete commentary in a responsive Bloomberg-terminal-inspired layout: near-black
 panels, orange interface labels, white headlines, and explicit email-safe contrast controls.

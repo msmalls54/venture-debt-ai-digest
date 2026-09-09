@@ -59,6 +59,7 @@ async def test_openrouter_allows_explicit_high_reasoning_for_editorial_work() ->
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["body"] = json.loads(request.content)
+        captured["timeout"] = request.extensions["timeout"]
         return httpx.Response(
             200,
             json={"choices": [{"message": {"content": '{"ok":true}'}}]},
@@ -78,6 +79,7 @@ async def test_openrouter_allows_explicit_high_reasoning_for_editorial_work() ->
         )
 
     assert captured["body"]["reasoning"] == {"effort": "high", "exclude": True}
+    assert captured["timeout"]["read"] == 120.0
 
 
 @pytest.mark.asyncio
